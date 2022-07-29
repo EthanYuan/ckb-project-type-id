@@ -3,7 +3,7 @@ use core::result::Result;
 
 // Import heap related library from `alloc`
 // https://doc.rust-lang.org/alloc/index.html
-use alloc::{vec, vec::Vec};
+use alloc::{string::ToString, vec, vec::Vec};
 
 // Import CKB syscalls and structures
 // https://nervosnetwork.github.io/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html
@@ -13,6 +13,7 @@ use ckb_std::{
     high_level::{load_script, load_tx_hash},
 };
 
+use super::helper;
 use crate::error::Error;
 
 pub fn main() -> Result<(), Error> {
@@ -26,6 +27,11 @@ pub fn main() -> Result<(), Error> {
     if args.is_empty() {
         return Err(Error::MyError);
     }
+
+    let mut hash = [0u8; 32];
+    hash.copy_from_slice(&args[0..32]);
+
+    helper::verify_type_id(&mut hash).map_err(|_| Error::MyError)?;
 
     let tx_hash = load_tx_hash()?;
     debug!("tx hash is {:?}", tx_hash);
