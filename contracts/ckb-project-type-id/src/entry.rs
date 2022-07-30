@@ -10,7 +10,7 @@ use alloc::{string::ToString, vec, vec::Vec};
 use ckb_std::{
     ckb_types::{bytes::Bytes, prelude::*},
     debug,
-    high_level::{load_script, load_tx_hash},
+    high_level::{load_script, load_script_hash, load_tx_hash, load_cell_data_hash, load_cell_data},
 };
 
 use super::helper;
@@ -28,10 +28,16 @@ pub fn main() -> Result<(), Error> {
         return Err(Error::MyError);
     }
 
-    let mut hash = [0u8; 32];
-    hash.copy_from_slice(&args[0..32]);
+    // check args
+    
 
-    helper::verify_type_id(&mut hash).map_err(|_| Error::MyError)?;
+    // check type id
+    let mut script_hash = load_script_hash()?;
+    helper::verify_type_id(&mut script_hash).map_err(|_| Error::InvalidTypeId)?;
+
+    // check data
+    // let data_hash = load_cell_data_hash()?;
+
 
     let tx_hash = load_tx_hash()?;
     debug!("tx hash is {:?}", tx_hash);
