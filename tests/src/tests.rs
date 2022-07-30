@@ -1,6 +1,7 @@
 use super::*;
 use ckb_testtool::builtin::ALWAYS_SUCCESS;
 use ckb_testtool::ckb_error::Error;
+use ckb_testtool::ckb_hash::blake2b_256;
 use ckb_testtool::ckb_types::{bytes::Bytes, core::TransactionBuilder, packed::*, prelude::*};
 use ckb_testtool::context::Context;
 
@@ -36,7 +37,9 @@ fn test_success() {
         .out_point(always_success_out_point)
         .build();
 
-    let type_script = context.build_script(&out_point, Bytes::from(vec![42; 20]));
+    let c_cell_data = Bytes::from(vec![42; 2]);
+    let data_hash = blake2b_256(c_cell_data);
+    let type_script = context.build_script(&out_point, Bytes::from(data_hash.to_vec()));
     let type_script = type_script.pack();
     let type_script_dep = CellDep::new_builder().out_point(out_point).build();
 
@@ -64,7 +67,7 @@ fn test_success() {
             .build(),
     ];
 
-    let outputs_data = vec![Bytes::new(); 2];
+    let outputs_data = vec![Bytes::from(vec![42; 2]), Bytes::new()];
 
     // build transaction
     let tx = TransactionBuilder::default()
@@ -99,7 +102,9 @@ fn test_two_type_id() {
         .out_point(always_success_out_point)
         .build();
 
-    let type_script = context.build_script(&out_point, Bytes::from(vec![42; 20]));
+    let c_cell_data = Bytes::from(vec![42; 2]);
+    let data_hash = blake2b_256(c_cell_data);
+    let type_script = context.build_script(&out_point, Bytes::from(data_hash.to_vec()));
     let type_script = type_script.pack();
     let type_script_dep = CellDep::new_builder().out_point(out_point).build();
 
@@ -128,7 +133,7 @@ fn test_two_type_id() {
             .build(),
     ];
 
-    let outputs_data = vec![Bytes::new(); 2];
+    let outputs_data = vec![Bytes::from(vec![42; 2]), Bytes::new()];
 
     // build transaction
     let tx = TransactionBuilder::default()

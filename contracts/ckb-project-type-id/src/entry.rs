@@ -31,8 +31,7 @@ pub fn main() -> Result<(), Error> {
     // check args
     if !QueryIter::new(load_cell_data_hash, Source::Output).any(|data_hash| {
         debug!("data_hash is {:?}", data_hash);
-        true
-        // data_hash == args[0..20]
+        data_hash == args[0..32]
     }) {
         return Err(Error::InvalidArgs);
     }
