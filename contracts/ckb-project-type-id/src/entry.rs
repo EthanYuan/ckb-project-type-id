@@ -3,14 +3,14 @@ use core::result::Result;
 
 // Import heap related library from `alloc`
 // https://doc.rust-lang.org/alloc/index.html
-use alloc::{string::ToString, vec, vec::Vec};
 
 // Import CKB syscalls and structures
 // https://nervosnetwork.github.io/ckb-std/riscv64imac-unknown-none-elf/doc/ckb_std/index.html
 use ckb_std::{
+    ckb_constants::Source,
     ckb_types::{bytes::Bytes, prelude::*},
     debug,
-    high_level::{load_script, load_script_hash, load_tx_hash, load_cell_data_hash, load_cell_data},
+    high_level::{load_cell_data, load_cell_data_hash, load_script, load_script_hash, QueryIter},
 };
 
 use super::helper;
@@ -29,20 +29,25 @@ pub fn main() -> Result<(), Error> {
     }
 
     // check args
-    
+    if !QueryIter::new(load_cell_data_hash, Source::Output).any(|data_hash| {
+        debug!("data_hash is {:?}", data_hash);
+        true
+        // data_hash == args[0..20]
+    }) {
+        return Err(Error::InvalidArgs);
+    }
 
     // check type id
     let mut script_hash = load_script_hash()?;
     helper::verify_type_id(&mut script_hash).map_err(|_| Error::InvalidTypeId)?;
 
     // check data
-    // let data_hash = load_cell_data_hash()?;
-
-
-    let tx_hash = load_tx_hash()?;
-    debug!("tx hash is {:?}", tx_hash);
-
-    let _buf: Vec<_> = vec![0u8; 32];
+    if !QueryIter::new(load_cell_data, Source::Output).any(|data| {
+        debug!("data is {:?}", data);
+        true
+    }) {
+        return Err(Error::InvalidData);
+    }
 
     Ok(())
 }

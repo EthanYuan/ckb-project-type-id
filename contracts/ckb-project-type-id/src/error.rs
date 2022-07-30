@@ -10,6 +10,8 @@ pub enum Error {
     // Add customized errors here...
     MyError,
     InvalidTypeId,
+    InvalidArgs,
+    InvalidData,
 }
 
 impl From<SysError> for Error {
