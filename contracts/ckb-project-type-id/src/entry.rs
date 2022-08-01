@@ -10,10 +10,7 @@ use ckb_std::{
     ckb_constants::Source,
     ckb_types::{bytes::Bytes, prelude::*},
     debug,
-    high_level::{
-        load_cell_data, load_cell_data_hash, load_cell_type_hash, load_script,
-        QueryIter,
-    },
+    high_level::{load_cell_data, load_script, QueryIter},
 };
 
 use super::helper;
@@ -27,27 +24,16 @@ pub fn main() -> Result<(), Error> {
     debug!("script args is {:?}", args);
 
     // return an error if args is invalid
-    if args.is_empty() {
-        return Err(Error::MyError);
-    }
-
-    // check args
-    if !QueryIter::new(load_cell_data_hash, Source::Output).any(|data_hash| {
-        debug!("data_hash is {:?}", data_hash);
-        data_hash == args[0..32]
-    }) {
+    if args.len() != 32 {
         return Err(Error::InvalidArgs);
     }
 
     // check type id
-    if !QueryIter::new(load_cell_type_hash, Source::Output).all(|script_hash| {
-        debug!("script_hash is {:?}", script_hash);
-        if let Some(mut script_hash) = script_hash {
-            helper::verify_type_id(&mut script_hash).is_ok()
-        } else {
-            true
-        }
-    }) {
+    let mut type_id = [0u8; 32];
+    type_id.copy_from_slice(&args[0..32]);
+    let ret = helper::verify_type_id(&mut type_id);
+    debug!("{:?}", ret);
+    if ret.is_err() {
         return Err(Error::InvalidTypeId);
     }
 
