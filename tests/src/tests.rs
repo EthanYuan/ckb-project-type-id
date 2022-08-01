@@ -62,7 +62,14 @@ fn test_success() {
             .lock(lock_script.clone())
             .build(),
     ];
-    let outputs_data = vec![Bytes::from(vec![42; 2]), Bytes::new()];
+
+   let output_data = vec![0u8, 0, 0, 0, 0, 0, 0, 10, 
+        0, 0, 0, 200, 
+        0, 0, 0, 100, 
+        0, 0, 0, 0, 0, 0, 0, 20, 
+        0, 0, 0, 50,
+        6,];
+    let outputs_data = vec![Bytes::from(output_data), Bytes::new()];
 
     // build transaction
     let tx = TransactionBuilder::default()

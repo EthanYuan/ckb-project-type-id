@@ -38,9 +38,9 @@ pub fn main() -> Result<(), Error> {
     }
 
     // check data
-    if !QueryIter::new(load_cell_data, Source::Output).any(|_data| {
-        debug!("data is {:?}", _data);
-        true
+    if !QueryIter::new(load_cell_data, Source::Output).any(|data| {
+        debug!("data is {:?}", data);
+        data.len() >= 29 // MIN: pledge info + 1 milestone info
     }) {
         return Err(Error::InvalidData);
     }
